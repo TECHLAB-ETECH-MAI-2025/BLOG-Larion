@@ -17,6 +17,7 @@
 ##Installation
 1- cloner le dépot :
     '''BASH
+    
    git clone https://github.com/TECHLAB-ETECH-MAI-2025/BLOG-Larion.git
    
 2- Importer le fichier .sql dans votre base de données MySQL

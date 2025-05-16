@@ -1,16 +1,19 @@
 #BLOG-Larion
   Ce projet est une application de blog développée dans le cadre du programme TECHLAB ETECH Mai 2025.
+  
 ##Fonctionnalités
 - Création et modification d'articles
 - Suppression d'articles
 - Affichage des articles
 - Ajout de commentaires par les visiteurs sous chaque article
+- 
 ##Technologies utilisées
 - PHP orienté objet
 - Symfony
 - MySQL
 - HTML/CSS
 - Bootstrap
+- 
 ##Installation
 1- cloner le dépot :
     '''BASH

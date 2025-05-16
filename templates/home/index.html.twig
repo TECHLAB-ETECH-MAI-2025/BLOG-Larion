@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Blog{% endblock %}
+
+{% block body %}
+<div class="container py-4" style="background-color:#fafafa;" >
+<h1 class="mb-5 text-center text-primary fw-bold" style="letter-spacing: 1.5px;">Bienvenue sur mon Blog</h1>
+    {# Formulaire création d'article #}
+    <section class="mb-5">
+        <h2 class="mb-4 border-bottom pb-2 text-dark">Créer un nouvel Article</h2>
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                    <div class="mb-3">
+                        {{ form_label(form.titre, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.titre, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                        {{ form_errors(form.titre) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.contenu, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(form.contenu, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                        {{ form_errors(form.contenu) }}
+                    </div>
+                {{ form_end(form) }}
+                <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+                        <i class="bi bi-plus-circle me-2"></i> Créer
+                    </button>
+            </div>
+        </div>
+    </section>
+
+    {# Liste des articles #}
+    <section>
+        <h2 class="mb-4 border-bottom pb-2 text-dark">Articles publiés</h2>
+
+        {% for article in articles %}
+            <div class="card mb-5 shadow-sm border-0 rounded-4 hover-shadow" style="transition: box-shadow 0.3s ease;">
+                <div class="card-body">
+                    <h3 class="card-title fw-bold text-primary mb-3">{{ article.titre }}</h3>
+                    <p class="card-text fs-5 text-secondary" style="white-space: pre-line;">{{ article.contenu }}</p>
+
+                    <a href="{{ path('app_commentaire_new', {'article': article.id}) }}" class="btn btn-outline-primary btn-sm rounded-pill mb-4">
+                        <i class="bi bi-chat-left-text"></i> Commenter
+                    </a>
+
+                    {# Liste des commentaires liés à cet article #}
+                    <h5 class="text-primary mb-3">Commentaires</h5>
+
+                    {% set commentairesArticle = commentaires|filter(c => c.article.id == article.id) %}
+                    {% if commentairesArticle|length > 0 %}
+                        <ul class="list-group list-group-flush">
+                            {% for commentaire in commentairesArticle %}
+                                <li class="list-group-item d-flex align-items-start gap-3">
+                                    <span class="badge bg-primary rounded-circle p-2 fs-6 text-white flex-shrink-0">
+                                        {{ commentaire.auteur|slice(0,1)|upper }}
+                                    </span>
+                                    <div>
+                                        <strong class="d-block text-primary">{{ commentaire.auteur }}</strong>
+                                        <p class="mb-0 text-muted">{{ commentaire.contenu }}</p>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted fst-italic">Aucun commentaire pour cet article.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <p class="text-center text-muted fst-italic">Aucun article trouvé.</p>
+        {% endfor %}
+    </section>
+
+</div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 10px 30px rgba(33, 37, 41, 0.2);
+    }
+</style>
+
+{% endblock %}

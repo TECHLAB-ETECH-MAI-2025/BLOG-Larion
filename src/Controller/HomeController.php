@@ -16,7 +16,7 @@ class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
-        // Création formulaire article
+        // Formulaire de création d'article
         $article = new Article();
         $articleForm = $this->createForm(ArticleType::class, $article);
         $articleForm->handleRequest($request);
@@ -24,32 +24,44 @@ class HomeController extends AbstractController
         if ($articleForm->isSubmitted() && $articleForm->isValid()) {
             $em->persist($article);
             $em->flush();
-
             return $this->redirectToRoute('app_home');
         }
 
         // Récupérer tous les articles
         $articles = $em->getRepository(Article::class)->findAll();
 
-        // Préparer un tableau pour stocker un formulaire commentaire par article
+        // Créer les formulaires de commentaires pour chaque article
         $commentairesForms = [];
 
         foreach ($articles as $articleEntity) {
             $commentaire = new Commentaire();
             $commentaire->setArticle($articleEntity);
 
-            $commentaireForm = $this->createForm(CommentaireType::class, $commentaire);
-            $commentaireForm->handleRequest($request);
+            $form = $this->createForm(CommentaireType::class, $commentaire, [
+                'action' => $this->generateUrl('app_home', ['comment_article_id' => $articleEntity->getId()]),
+                'method' => 'POST',
+            ]);
 
-            // Ici on vérifie si ce formulaire est soumis ET valide
-            if ($commentaireForm->isSubmitted() && $commentaireForm->isValid()) {
-                $em->persist($commentaire);
-                $em->flush();
+            $commentairesForms[$articleEntity->getId()] = $form->handleRequest($request)->createView();
+        }
 
-                return $this->redirectToRoute('app_home');
+        // Vérifier si un commentaire a été soumis
+        $commentArticleId = $request->query->get('comment_article_id');
+        if ($commentArticleId) {
+            $articleCommented = $em->getRepository(Article::class)->find($commentArticleId);
+            if ($articleCommented) {
+                $commentaire = new Commentaire();
+                $commentaire->setArticle($articleCommented);
+
+                $form = $this->createForm(CommentaireType::class, $commentaire);
+                $form->handleRequest($request);
+
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $em->persist($commentaire);
+                    $em->flush();
+                    return $this->redirectToRoute('app_home');
+                }
             }
-
-            $commentairesForms[$articleEntity->getId()] = $commentaireForm->createView();
         }
 
         return $this->render('home/index.html.twig', [

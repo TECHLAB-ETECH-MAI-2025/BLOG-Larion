@@ -3,26 +3,30 @@
 {% block title %}Accueil - Blog{% endblock %}
 
 {% block body %}
-<div class="container py-4" style="background-color:#fafafa;" >
-<h1 class="mb-5 text-center text-primary fw-bold" style="letter-spacing: 1.5px;">Bienvenue sur mon Blog</h1>
+<div class="container py-4" style="background-color:#fafafa;">
+    <h1 class="mb-5 text-center text-primary fw-bold" style="letter-spacing: 1.5px;">
+        Bienvenue sur mon Blog
+    </h1>
+
     {# Formulaire création d'article #}
     <section class="mb-5">
         <h2 class="mb-4 border-bottom pb-2 text-dark">Créer un nouvel Article</h2>
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-body">
-                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                {{ form_start(articleForm, {'attr': {'novalidate': 'novalidate'}}) }}
                     <div class="mb-3">
-                        {{ form_label(form.titre, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                        {{ form_widget(form.titre, {'attr': {'class': 'form-control form-control-lg'}}) }}
-                        {{ form_errors(form.titre) }}
+                        {{ form_label(articleForm.titre, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(articleForm.titre, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                        {{ form_errors(articleForm.titre) }}
                     </div>
                     <div class="mb-3">
-                        {{ form_label(form.contenu, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                        {{ form_widget(form.contenu, {'attr': {'class': 'form-control', 'rows': 5}}) }}
-                        {{ form_errors(form.contenu) }}
+                        {{ form_label(articleForm.contenu, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(articleForm.contenu, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                        {{ form_errors(articleForm.contenu) }}
                     </div>
-                {{ form_end(form) }}
-                <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+                   
+                {{ form_end(articleForm) }}
+                 <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
                         <i class="bi bi-plus-circle me-2"></i> Créer
                     </button>
             </div>
@@ -38,17 +42,22 @@
                 <div class="card-body">
                     <h3 class="card-title fw-bold text-primary mb-3">{{ article.titre }}</h3>
                     <p class="card-text fs-5 text-secondary" style="white-space: pre-line;">{{ article.contenu }}</p>
-
-                    <a href="{{ path('app_commentaire_new', {'article': article.id}) }}" class="btn btn-outline-primary btn-sm rounded-pill mb-4">
-                        <i class="bi bi-chat-left-text"></i> Commenter
-                    </a>
-
+                    
+                    {% if article.categories is not empty %}
+                        <p class="text-muted mb-2">
+                            Catégories :
+                            {% for categorie in article.categories %}
+                                <span class="badge bg-secondary">{{ categorie.nom }}</span>{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                    
                     {# Liste des commentaires liés à cet article #}
                     <h5 class="text-primary mb-3">Commentaires</h5>
 
-                    {% set commentairesArticle = commentaires|filter(c => c.article.id == article.id) %}
+                    {% set commentairesArticle = article.commentaires %}
                     {% if commentairesArticle|length > 0 %}
-                        <ul class="list-group list-group-flush">
+                        <ul class="list-group list-group-flush mb-3">
                             {% for commentaire in commentairesArticle %}
                                 <li class="list-group-item d-flex align-items-start gap-3">
                                     <span class="badge bg-primary rounded-circle p-2 fs-6 text-white flex-shrink-0">
@@ -62,21 +71,37 @@
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-muted fst-italic">Aucun commentaire pour cet article.</p>
+                        <p class="text-muted fst-italic mb-3">Aucun commentaire pour cet article.</p>
                     {% endif %}
+
+                    {# Formulaire commentaire sous l'article #}
+                    <h6 class="text-secondary mb-2">Ajouter un commentaire</h6>
+
+                    {{ form_start(commentairesForms[article.id]) }}
+                        <div class="mb-3">
+                            {{ form_label(commentairesForms[article.id].auteur, 'Votre nom', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(commentairesForms[article.id].auteur, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(commentairesForms[article.id].auteur) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(commentairesForms[article.id].contenu, 'Votre commentaire', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(commentairesForms[article.id].contenu, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                            {{ form_errors(commentairesForms[article.id].contenu) }}
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Envoyer</button>
+                    {{ form_end(commentairesForms[article.id]) }}
                 </div>
             </div>
         {% else %}
             <p class="text-center text-muted fst-italic">Aucun article trouvé.</p>
         {% endfor %}
     </section>
-
 </div>
 
 <style>
-    .hover-shadow:hover {
-        box-shadow: 0 10px 30px rgba(33, 37, 41, 0.2);
-    }
+.hover-shadow:hover {
+    box-shadow: 0 10px 30px rgba(33, 37, 41, 0.2);
+}
 </style>
 
 {% endblock %}

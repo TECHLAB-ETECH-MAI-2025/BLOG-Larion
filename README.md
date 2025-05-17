@@ -25,7 +25,7 @@
    Configurer la connexion à la base de données
    
 3- lancer le serveur local
-   php -S localhost:8000
+   php -S localhost:8000 ou symfony server:start
    
 Auteur
  Larion Andrianina RAKOTONIRINA

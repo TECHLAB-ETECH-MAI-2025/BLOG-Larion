@@ -22,7 +22,7 @@
    git clone https://github.com/TECHLAB-ETECH-MAI-2025/BLOG-Larion.git
    
 2- Importer le fichier .sql dans votre base de données MySQL
-   Configurer la connexion à la base de données =>(j'ai pas mis le fichier.sql pour raison de sécurité)
+   Configurer la connexion à la base de données
    
 3- lancer le serveur local
    php -S localhost:8000

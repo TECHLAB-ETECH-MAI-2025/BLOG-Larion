@@ -2,10 +2,10 @@
   Ce projet est une application de blog développée dans le cadre du programme TECHLAB ETECH Mai 2025.
   
 ##Fonctionnalités
-- Création et modification d'articles
-- Suppression d'articles
-- Affichage des articles
-- Ajout de commentaires par les visiteurs sous chaque article
+- Création d'article avec un formulaire par les utilisateurs
+- publication des articles sur la page après la soumission du formulaire de creation d'article
+  sous le même page
+- Ajout de commentaires à l'aide d'un formulaire sous chaque article publié par les visiteurs
   
 ##Technologies utilisées
 - PHP orienté objet

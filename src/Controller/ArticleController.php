@@ -25,7 +25,7 @@ public function index(Request $request, ArticleRepository $articleRepository, Pa
     $pagination = $paginator->paginate(
         $query,                     // Requête à paginer
         $request->query->getInt('page', 1), // Numéro de la page depuis l'URL (default = 1)
-        10                         // Nombre d'articles par page
+        10                        // Nombre d'articles par page
     );
 
     return $this->render('article/index.html.twig', [

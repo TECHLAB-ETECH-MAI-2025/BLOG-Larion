@@ -6,6 +6,7 @@ use App\Entity\Commentaire;
 use App\Form\ArticleType;
 use App\Form\CommentaireType;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(Request $request, EntityManagerInterface $em): Response
+    public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
     {
         // Formulaire de création d'article
         $article = new Article();
@@ -27,8 +28,17 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        // Récupérer tous les articles
-        $articles = $em->getRepository(Article::class)->findAll();
+        // PAGINATION des articles
+        $query = $em->getRepository(Article::class)
+            ->createQueryBuilder('a')
+            ->orderBy('a.id', 'DESC')
+            ->getQuery();
+
+        $articles = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            3// Nombre d'articles par page
+        );
 
         // Créer les formulaires de commentaires pour chaque article
         $commentairesForms = [];

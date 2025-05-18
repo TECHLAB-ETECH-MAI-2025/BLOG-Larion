@@ -24,10 +24,15 @@
                         {{ form_widget(articleForm.contenu, {'attr': {'class': 'form-control', 'rows': 5}}) }}
                         {{ form_errors(articleForm.contenu) }}
                     </div>
-                
+                <div class="mb-3">
+    {{ form_label(articleForm.categories, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+    {{ form_widget(articleForm.categories, {'attr': {'class': 'form-select'}}) }}
+    {{ form_errors(articleForm.categories) }}
+</div>
                  <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
                         <i class="bi bi-plus-circle me-2"></i> Créer
-                    </button>{{ form_end(articleForm) }}
+                    </button>
+                    {{ form_end(articleForm) }}
             </div>
         </div>
     </section>

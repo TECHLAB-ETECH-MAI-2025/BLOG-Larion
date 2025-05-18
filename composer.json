@@ -12,6 +12,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^2.20",
         "knplabs/knp-paginator-bundle": "^6.2",
+        "sensio/framework-extra-bundle": "^6.2",
         "symfony/asset": "6.0.*",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",

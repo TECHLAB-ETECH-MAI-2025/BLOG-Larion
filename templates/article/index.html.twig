@@ -23,7 +23,7 @@
             <tr>
                 <td>{{ article.id }}</td>
                 <td>{{ article.titre }}</td>
-                <td>{{ article.contenu }}</td>
+                <td>{{ article.contenu|length > 100 ? article.contenu|slice(0, 100) ~ '...' : article.contenu }}</td>
                 <td>
                     {% for cat in article.categories %}
                         <span class="badge bg-secondary">{{ cat.nom }}</span>
@@ -41,5 +41,10 @@
         {% endfor %}
         </tbody>
     </table>
+</div>
+<div class="d-flex justify-content-center my-4">
+    <nav aria-label="Pagination">
+        {{ knp_pagination_render(articles, 'pagination/bootstrap_v5_pagination.html.twig') }}
+    </nav>
 </div>
 {% endblock %}

@@ -1,50 +1,68 @@
+{# templates/article/index.html.twig #}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Liste des articles{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('article_list') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('article_list') }}
+{% endblock %}
+
 {% block body %}
-<div class="container mt-5">
-    <h1 class="mb-4">Liste des articles</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4">Liste des articles</h1>
 
-    <a href="{{ path('app_article_new') }}" class="btn btn-primary mb-3">Créer un nouvel article</a>
+        <div class="mb-3 text-end search-container">
+            <a href="{{ path('app_article_new') }}" class="btn btn-primary">➕ Nouvel article</a>
+            <div id="search-results" class="search-results"></div> {# conteneur pour résultats ajax #}
+        </div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Titre</th>
-                <th>Contenu</th>
-                <th>Catégories</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for article in articles %}
-            <tr>
-                <td>{{ article.id }}</td>
-                <td>{{ article.titre }}</td>
-                <td>{{ article.contenu|length > 100 ? article.contenu|slice(0, 100) ~ '...' : article.contenu }}</td>
-                <td>
-                    {% for cat in article.categories %}
-                        <span class="badge bg-secondary">{{ cat.nom }}</span>
-                    {% endfor %}
-                </td>
-                <td>
-                    <a href="{{ path('app_article_show', {'id': article.id}) }}" class="btn btn-sm btn-success">Voir</a>
-                    <a href="{{ path('app_article_edit', {'id': article.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5" class="text-center">Aucun article trouvé</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="d-flex justify-content-center my-4">
-    <nav aria-label="Pagination">
-        {{ knp_pagination_render(articles, 'pagination/bootstrap_v5_pagination.html.twig') }}
-    </nav>
-</div>
+        <table id="articles-table" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Titre</th>
+                    <th>Catégories</th>
+                    <th>Commentaires</th>
+                    <th>J'aime</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td>{{ article.id }}</td>
+                        <td>{{ article.titre }}</td>
+                        <td>
+                            {% for cat in article.categories %}
+                                <span class="badge bg-secondary">{{ cat.nom }}</span>
+                            {% else %}
+                                <span class="text-muted">Aucune catégorie</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ article.commentaires ? article.commentaires|length : 0 }}</td>
+                        <td>{{ article.articleLikes ? article.articleLikes|length : 0 }}</td>
+                        <td>{{ article.dateCreation ? article.dateCreation|date('d/m/Y') : '' }}</td>
+                        <td>
+                            {{ include('article/_actions.html.twig', { article: article }) }}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucun article trouvé</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+   
+    </div>
 {% endblock %}

@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Commentaire;
+use App\Entity\Article;
 use App\Form\CommentaireType;
 use App\Repository\CommentaireRepository;
+use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,5 +79,39 @@ class CommentaireController extends AbstractController
         }
 
         return $this->redirectToRoute('app_commentaire_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    // Nouvelle méthode pour ajouter un commentaire lié à un article
+    #[Route('/add/{articleId}', name: 'commentaire_add', methods: ['POST'])]
+    public function addCommentaire(
+        int $articleId,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ArticleRepository $articleRepository
+    ): Response {
+        $article = $articleRepository->find($articleId);
+
+        if (!$article) {
+            throw $this->createNotFoundException('Article non trouvé.');
+        }
+
+        $author = $request->request->get('author');
+        $content = $request->request->get('content');
+
+        if (!$author || !$content) {
+            $this->addFlash('error', 'Auteur et contenu sont obligatoires.');
+            return $this->redirectToRoute('app_article_show', ['id' => $articleId]);
+        }
+
+        $commentaire = new Commentaire();
+        $commentaire->setAuteur($author);
+        $commentaire->setContenu($content);
+        $commentaire->setArticle($article);
+        $commentaire->setCreatedAt(new \DateTime()); // <-- correction ici
+
+        $entityManager->persist($commentaire);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_article_show', ['id' => $articleId]);
     }
 }

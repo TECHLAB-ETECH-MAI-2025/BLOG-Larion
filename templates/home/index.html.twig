@@ -24,15 +24,15 @@
                         {{ form_widget(articleForm.contenu, {'attr': {'class': 'form-control', 'rows': 5}}) }}
                         {{ form_errors(articleForm.contenu) }}
                     </div>
-                <div class="mb-3">
-    {{ form_label(articleForm.categories, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-    {{ form_widget(articleForm.categories, {'attr': {'class': 'form-select'}}) }}
-    {{ form_errors(articleForm.categories) }}
-</div>
-                 <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+                    <div class="mb-3">
+                        {{ form_label(articleForm.categories, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                        {{ form_widget(articleForm.categories, {'attr': {'class': 'form-select'}}) }}
+                        {{ form_errors(articleForm.categories) }}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
                         <i class="bi bi-plus-circle me-2"></i> Créer
                     </button>
-                    {{ form_end(articleForm) }}
+                {{ form_end(articleForm) }}
             </div>
         </div>
     </section>
@@ -56,44 +56,63 @@
                         </p>
                     {% endif %}
                     
-                    {# Liste des commentaires liés à cet article #}
-                    <h5 class="text-primary mb-3">Commentaires</h5>
+                    {# Bouton J'aime #}
+                    <form method="post" class="like-form mt-3"
+                          data-url="{{ path('app_article_like', {'id': article.id}) }}"
+                          data-id="{{ article.id }}"
+                          data-token="{{ csrf_token('like' ~ article.id) }}">
+                        <button type="submit" class="btn btn-outline-danger">
+                            ❤️ <span class="like-count">{{ article.articleLikes|length }}</span>
+                        </button>
+                    </form>
 
-                    {% set commentairesArticle = article.commentaires %}
-                    {% if commentairesArticle|length > 0 %}
-                        <ul class="list-group list-group-flush mb-3">
-                            {% for commentaire in commentairesArticle %}
-                                <li class="list-group-item d-flex align-items-start gap-3">
-                                    <span class="badge bg-primary rounded-circle p-2 fs-6 text-white flex-shrink-0">
-                                        {{ commentaire.auteur|slice(0,1)|upper }}
-                                    </span>
-                                    <div>
-                                        <strong class="d-block text-primary">{{ commentaire.auteur }}</strong>
-                                        <p class="mb-0 text-muted">{{ commentaire.contenu }}</p>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted fst-italic mb-3">Aucun commentaire pour cet article.</p>
-                    {% endif %}
+                    {# Container commentaires + formulaire #}
+                    <div class="comment-block" id="comment-block-{{ article.id }}">
+                        <h5 class="text-primary mb-3 mt-4">Commentaires</h5>
 
-                    {# Formulaire commentaire sous l'article #}
-                    <h6 class="text-secondary mb-2">Ajouter un commentaire</h6>
+                        {% set commentairesArticle = article.commentaires %}
+                        {% if commentairesArticle|length > 0 %}
+                            <ul class="list-group list-group-flush mb-3">
+                                {% for commentaire in commentairesArticle %}
+                                    <li class="list-group-item d-flex align-items-start gap-3">
+                                        <span class="badge bg-primary rounded-circle p-2 fs-6 text-white flex-shrink-0">
+                                            {{ commentaire.auteur|slice(0,1)|upper }}
+                                        </span>
+                                        <div>
+                                            <strong class="d-block text-primary">{{ commentaire.auteur }}</strong>
+                                            <p class="mb-0 text-muted">{{ commentaire.contenu }}</p>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted fst-italic mb-3">Aucun commentaire pour cet article.</p>
+                        {% endif %}
 
-                    {{ form_start(commentairesForms[article.id]) }}
-                        <div class="mb-3">
-                            {{ form_label(commentairesForms[article.id].auteur, 'Votre nom', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(commentairesForms[article.id].auteur, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(commentairesForms[article.id].auteur) }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form_label(commentairesForms[article.id].contenu, 'Votre commentaire', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(commentairesForms[article.id].contenu, {'attr': {'class': 'form-control', 'rows': 3}}) }}
-                            {{ form_errors(commentairesForms[article.id].contenu) }}
-                        </div>
-                        <button type="submit" class="btn btn-outline-primary btn-sm">Envoyer</button>
-                    {{ form_end(commentairesForms[article.id]) }}
+                        {# Formulaire commentaire sous l'article #}
+                        <h6 class="text-secondary mb-2">Ajouter un commentaire</h6>
+
+                        {{ form_start(commentairesForms[article.id], {
+                            'attr': {
+                                'class': 'comment-form',
+                                'data-article-id': article.id,
+                                'action': path('app_commentaire_new', {'id': article.id}),
+                                'method': 'POST'
+                            }
+                        }) }}
+                            <div class="mb-3">
+                                {{ form_label(commentairesForms[article.id].auteur, 'Votre nom', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(commentairesForms[article.id].auteur, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(commentairesForms[article.id].auteur) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(commentairesForms[article.id].contenu, 'Votre commentaire', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(commentairesForms[article.id].contenu, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                                {{ form_errors(commentairesForms[article.id].contenu) }}
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Envoyer</button>
+                        {{ form_end(commentairesForms[article.id]) }}
+                    </div>
                 </div>
             </div>
         {% else %}
@@ -101,15 +120,19 @@
         {% endfor %}
     </section>
 </div>
+
 <div class="d-flex justify-content-center my-4">
     <nav aria-label="Pagination">
         {{ knp_pagination_render(articles, 'pagination/bootstrap_v5_pagination.html.twig') }}
     </nav>
+</div>
 
 <style>
 .hover-shadow:hover {
-    box-shadow: 0 10px 30px rgba(33, 37, 41, 0.2);
+    box-shadow: 0 10px 30px rgba(33, 37, 41, 0.2)
 }
 </style>
 
+<script src="{{ asset('js/like.js') }}"></script>
+<script src="{{ asset('js/coment.js') }}?v={{ random() }}"></script>
 {% endblock %}

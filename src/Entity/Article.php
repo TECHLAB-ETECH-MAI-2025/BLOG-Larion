@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Categorie;
+use App\Entity\ArticleLike;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
@@ -22,16 +24,26 @@ class Article
     #[ORM\Column(type: Types::TEXT)]
     private ?string $contenu = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateCreation = null;
+
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Commentaire::class, orphanRemoval: true)]
+    private Collection $commentaires;
+
     #[ORM\ManyToMany(targetEntity: Categorie::class, inversedBy: 'articles')]
+    #[ORM\JoinTable(name: 'article_categorie')]
     private Collection $categories;
 
-    #[ORM\OneToMany(mappedBy: 'article', targetEntity: Commentaire::class)]
-    private Collection $commentaires;
+    // Ajout de la relation vers ArticleLike
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleLike::class, orphanRemoval: true)]
+    private Collection $articleLikes;
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
+        $this->categories = new ArrayCollection();
+        $this->articleLikes = new ArrayCollection();
+        $this->dateCreation = new \DateTime();
     }
 
     public function getId(): ?int
@@ -47,6 +59,7 @@ class Article
     public function setTitre(string $titre): static
     {
         $this->titre = $titre;
+
         return $this;
     }
 
@@ -58,29 +71,18 @@ class Article
     public function setContenu(string $contenu): static
     {
         $this->contenu = $contenu;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Categorie>
-     */
-    public function getCategories(): Collection
-    {
-        return $this->categories;
-    }
-
-    public function addCategorie(Categorie $categorie): static
-    {
-        if (!$this->categories->contains($categorie)) {
-            $this->categories->add($categorie);
-        }
 
         return $this;
     }
 
-    public function removeCategorie(Categorie $categorie): static
+    public function getDateCreation(): ?\DateTimeInterface
     {
-        $this->categories->removeElement($categorie);
+        return $this->dateCreation;
+    }
+
+    public function setDateCreation(\DateTimeInterface $dateCreation): static
+    {
+        $this->dateCreation = $dateCreation;
 
         return $this;
     }
@@ -106,7 +108,6 @@ class Article
     public function removeCommentaire(Commentaire $commentaire): static
     {
         if ($this->commentaires->removeElement($commentaire)) {
-            // set the owning side to null (unless already changed)
             if ($commentaire->getArticle() === $this) {
                 $commentaire->setArticle(null);
             }
@@ -114,8 +115,39 @@ class Article
 
         return $this;
     }
-    public function __toString(): string
+
+    /**
+     * @return Collection<int, Categorie>
+     */
+    public function getCategories(): Collection
     {
-        return $this->getTitre() ?? ''; // ou une autre propriété représentative
+        return $this->categories;
+    }
+
+    public function addCategorie(Categorie $categorie): static
+    {
+        if (!$this->categories->contains($categorie)) {
+            $this->categories->add($categorie);
+            $categorie->addArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategorie(Categorie $categorie): static
+    {
+        if ($this->categories->removeElement($categorie)) {
+            $categorie->removeArticle($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ArticleLike>
+     */
+    public function getArticleLikes(): Collection
+    {
+        return $this->articleLikes;
     }
 }

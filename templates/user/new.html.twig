@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New User{% endblock %}
+
+{% block body %}
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Creer un nouveau utilisateur</h3>
+        </div>
+        <div class="card-body">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn btn-primary mt-3">Sauvegarder</button>
+            {{ form_end(form) }}
+
+            <a href="{{ path('app_user_index') }}" class="btn btn-outline-secondary mt-3">← Retour à la liste</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

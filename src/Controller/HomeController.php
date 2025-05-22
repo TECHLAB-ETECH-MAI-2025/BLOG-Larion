@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
-    #[Route('/', name: 'app_home')]
+    #[Route('/home', name: 'app_home')]
     public function index(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
     {
         // Formulaire de création d'article

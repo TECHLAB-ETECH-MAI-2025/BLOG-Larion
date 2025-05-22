@@ -1,3 +1,4 @@
+{% if app.request.get('_route') not in ['app_login', 'app_register'] %}
 <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4 border-bottom">
   <div class="container">
     <a class="navbar-brand fw-bold" href="{{ path('app_home') }}">Mon Blog</a>
@@ -31,8 +32,18 @@
              href="{{ path('app_commentaire_index') }}">
             <i class="bi bi-chat-left-dots me-1"></i> Commentaires
           </a>
-        </li>
-      </ul>
+          </li>
+   <li class="nav-item d-flex align-items-center">
+  <form action="{{ path('app_logout') }}" method="post" class="d-flex align-items-center mb-0">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+    <button type="submit" class="btn btn-outline-danger btn-sm ms-2 d-flex align-items-center">
+      <i class="bi bi-box-arrow-right me-1"></i> Se deconnecter
+    </button>
+  </form>
+</li>
+
+  </ul>
     </div>
   </div>
 </nav>
+{% endif %}

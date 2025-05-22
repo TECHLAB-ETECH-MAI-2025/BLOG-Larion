@@ -1,34 +1,62 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Détail de la Catégorie{% endblock %}
+{% block title %}{{ article.titre }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('article') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('article') }}
+{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1 class="mb-4">Détails de la catégorie</h1>
+    <h1>{{ article.titre }}</h1>
 
-        <table class="table table-bordered shadow-sm">
-            <tbody>
-                <tr>
-                    <th>ID</th>
-                    <td>{{ categorie.id }}</td>
-                </tr>
-                <tr>
-                    <th>Nom</th>
-                    <td>{{ categorie.nom }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <p><strong>Nombre de likes :</strong> {{ article.articleLikes|length }}</p>
 
-        <div class="d-flex gap-2">
-            <a href="{{ path('app_categorie_index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Retour à la liste
-            </a>
+    <a href="{{ path('article_index') }}">← Retour à la liste</a>
 
-            <a href="{{ path('app_categorie_edit', {'id': categorie.id}) }}" class="btn btn-primary">
-                <i class="bi bi-pencil"></i> Modifier
-            </a>
+    <hr>
 
-            {{ include('categorie/_delete_form.html.twig') }}
-        </div>
-    </div>
+    <p>{{ article.contenu|nl2br }}</p>
+
+    {% if article.categories|length > 0 %}
+        <p><strong>Catégories :</strong></p>
+        <ul>
+            {% for categorie in article.categories %}
+                <li>{{ categorie.titre }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p><strong>Publié le :</strong> {{ article.createdAt|date('d/m/Y H:i') }}</p>
+
+    <hr>
+
+    <h2>Commentaires ({{ article.commentaires|length }})</h2>
+
+    <h3>Ajouter un commentaire</h3>
+
+    <form method="post" action="{{ path('commentaire_add', { articleId: article.id }) }}">
+        <label for="author">Votre nom</label><br>
+        <input type="text" name="author" id="author"><br><br>
+
+        <label for="content">Votre commentaire</label><br>
+        <textarea name="content" id="content" rows="4"></textarea><br><br>
+
+        <button type="submit">Publier</button>
+    </form>
+
+    <hr>
+
+    {% if article.commentaires|length > 0 %}
+        {% for commentaire in article.commentaires|sort((a, b) => b.createdAt <=> a.createdAt) %}
+            {% include 'commentaire/_comment.html.twig' with {'commentaire': commentaire} %}
+        {% endfor %}
+    {% else %}
+        <p>Aucun commentaire pour le moment. Soyez le premier à réagir !</p>
+    {% endif %}
 {% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+<div class="d-flex align-items-center justify-content-center vh-100 bg-light">
+  <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
+    <h1 class="h3 mb-4 text-center">Bienvenue sur notre Blog !</h1>
+    <p class="text-center mb-4 text-secondary">Connectez-vous pour accéder à votre espace et découvrir les dernières actualités.</p>
+
+    {% if error %}
+      <div class="alert alert-danger" role="alert">
+        {{ error.messageKey|trans(error.messageData, 'security') }}
+      </div>
+    {% endif %}
+
+    {% if app.user %}
+      <div class="alert alert-info text-center" role="alert">
+        You are logged in as <strong>{{ app.user.userIdentifier }}</strong>, <a href="{{ path('app_logout') }}">Logout</a>
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      <div class="mb-3">
+        <label for="inputEmail" class="form-label">Email address</label>
+        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+      </div>
+
+      <div class="mb-4">
+        <label for="inputPassword" class="form-label">Password</label>
+        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+      </div>
+
+      <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+      <button class="btn btn-primary w-100" type="submit">Sign in</button>
+
+      <div class="text-center mt-3">
+        <small>Don't have an account? <a href="{{ path('app_register') }}">Create one</a></small>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

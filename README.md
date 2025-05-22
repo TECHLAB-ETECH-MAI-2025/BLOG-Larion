@@ -4,8 +4,10 @@
 ##Fonctionnalités
 - Création d'article avec un formulaire par les utilisateurs
 - publication des articles sur la page après la soumission du formulaire de creation d'article
-  sous le même page
-- Ajout de commentaires à l'aide d'un formulaire sous chaque article publié par les visiteurs
+  sous le même page et systeme de j'aime en temps réel sans rechergement de page
+- Ajout de commentaires en  temps reel sans rechargement de page à l'aide d'un formulaire sous chaque article publié par les visiteurs
+- Systeme de recherche en temps réel à la liste des articles avec tri des listes avec datables et ajax
+- Systeme d'authentification sécurisé
   
 ##Technologies utilisées
 - PHP orienté objet
@@ -14,6 +16,7 @@
 - HTML/CSS
 - twig
 - Bootstrap
+- Javascript,ajax,jQuery,DataTable
   
 ##Installation
 
@@ -27,7 +30,7 @@
    
 3- lancer le serveur local
    php -S localhost:8000 ou symfony server:start
-   
+     
 Auteur
  Larion Andrianina RAKOTONIRINA
   

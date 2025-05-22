@@ -12,6 +12,7 @@
 - Symfony
 - MySQL
 - HTML/CSS
+- twig
 - Bootstrap
   
 ##Installation

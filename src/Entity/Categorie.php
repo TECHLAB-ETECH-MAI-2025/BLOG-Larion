@@ -62,7 +62,7 @@ class Categorie
     }
     public function __toString(): string
 {
-    return $this->nom; // par exemple
+    return $this->nom; 
 }
 
     public function removeArticle(Article $article): static

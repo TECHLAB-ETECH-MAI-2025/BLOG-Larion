@@ -9,7 +9,7 @@
         "ext-iconv": "*",
         "doctrine/annotations": "^2.0",
         "doctrine/doctrine-bundle": "^2.13",
-        "doctrine/doctrine-migrations-bundle": "^3.4",
+        "doctrine/doctrine-migrations-bundle": "3.4",
         "doctrine/orm": "^2.20",
         "knplabs/knp-paginator-bundle": "^6.2",
         "sensio/framework-extra-bundle": "^6.2",
@@ -19,14 +19,20 @@
         "symfony/flex": "^2",
         "symfony/form": "6.0.*",
         "symfony/framework-bundle": "6.0.*",
+        "symfony/mailer": "6.0.*",
         "symfony/runtime": "6.0.*",
+        "symfony/security-bundle": "6.0.*",
         "symfony/security-csrf": "6.0.*",
         "symfony/twig-bundle": "6.0.*",
         "symfony/validator": "6.0.*",
+        "symfony/webpack-encore-bundle": "^1.17",
         "symfony/yaml": "6.0.*",
+        "symfonycasts/reset-password-bundle": "^1.23",
+        "symfonycasts/verify-email-bundle": "^1.17",
         "twig/string-extra": "^3.8"
     },
     "require-dev": {
+        "symfony/debug-bundle": "6.0.*",
         "symfony/maker-bundle": "^1.50"
     },
     "config": {

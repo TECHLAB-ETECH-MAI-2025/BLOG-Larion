@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class ArticleType extends AbstractType
 {
@@ -19,8 +20,8 @@ class ArticleType extends AbstractType
             ->add('categories', EntityType::class, [
                 'class' => Categorie::class,
                 'choice_label' => 'nom',
-                'multiple' => true,     // car ManyToMany
-                'expanded' => false     // mettre à true si tu veux des cases à cocher
+                'multiple' => true,     
+                'expanded' => false     
             ]);
     }
 

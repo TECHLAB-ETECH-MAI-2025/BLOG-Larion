@@ -1,0 +1,39 @@
+{# templates/article/_actions.html.twig #}
+
+{# Boutons Actions : Modifier et Supprimer #}
+<div class="btn-group" role="group" aria-label="Actions article">
+
+    <a href="{{ path('app_article_edit', {'id': article.id}) }}" class="btn btn-sm btn-primary">
+        Modifier
+    </a>
+
+    <!-- Bouton déclencheur de la modale de confirmation -->
+    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ article.id }}">
+        Supprimer
+    </button>
+
+</div>
+
+{# Modale Bootstrap pour la confirmation de suppression #}
+<div class="modal fade" id="deleteModal{{ article.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ article.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel{{ article.id }}">Confirmation de suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        Êtes-vous sûr de vouloir supprimer l'article "<strong>{{ article.titre }}</strong>" ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        
+        {# Formulaire de suppression sécurisé par méthode POST et token CSRF #}
+        <form method="post" action="{{ path('app_article_delete', {'id': article.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cet article ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

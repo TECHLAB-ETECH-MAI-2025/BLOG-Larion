@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des utilisateurs{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Ajout Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Liste des utilisateurs</h1>
+
+        <table class="table table-striped table-hover table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Prénom</th>
+                    <th>Nom</th>
+                    <th>Rôles</th>
+                    <th>Créé le</th>
+                    <th>Vérifié ?</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.firstName ?? '—' }}</td>
+                    <td>{{ user.lastName ?? '—' }}</td>
+                    <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+                    <td>{{ user.createdAt ? user.createdAt|date('d/m/Y H:i') : '—' }}</td>
+                    <td>
+                        {% if user.isVerified %}
+                            ✅
+                        {% else %}
+                            ❌
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-sm btn-primary">Afficher</a>
+                        <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">Aucun utilisateur trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ path('app_user_new') }}" class="btn btn-success">Créer un nouvel utilisateur</a>
+    </div>
+{% endblock %}

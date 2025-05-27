@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chat en temps réel{% endblock %}
+
+{% block body %}
+<div class="container my-4">
+  <h1 class="mb-4 text-center">💬 Messenger</h1>
+
+  <div id="messages" class="border rounded p-3 bg-light mb-3" style="height: 300px; overflow-y: auto;">
+    {% for message in messages %}
+      <div class="mb-2">
+        <strong class="text-primary">{{ message.user.firstName }}</strong> :
+        <span>{{ message.content }}</span>
+        <small class="text-muted float-end">{{ message.createdAt|date('H:i') }}</small>
+      </div>
+    {% endfor %}
+  </div>
+
+  <form id="chatForm" class="d-flex gap-2">
+    <input type="text" id="content" class="form-control" placeholder="Tape ton message..." required>
+    <button type="submit" class="btn btn-primary">Envoyer</button>
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById('chatForm');
+  const contentInput = document.getElementById('content');
+  const messagesDiv = document.getElementById('messages');
+  let lastMessages = [];
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const content = contentInput.value.trim();
+    if (!content) return;
+
+    fetch('{{ path('chat_send') }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ content: content })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        contentInput.value = '';
+        loadMessages();
+      } else {
+        alert('Erreur : ' + (data.message || 'Une erreur est survenue'));
+      }
+    });
+  });
+
+  function loadMessages() {
+    fetch('{{ path('chat_messages') }}')
+      .then(res => res.json())
+      .then(data => {
+        if (JSON.stringify(data) !== JSON.stringify(lastMessages)) {
+          messagesDiv.innerHTML = '';
+          data.forEach(m => {
+            const div = document.createElement('div');
+            div.classList.add('mb-2');
+            div.innerHTML = `<strong class="text-primary">${m.user}</strong> : 
+                             <span>${m.content}</span> 
+                             <small class="text-muted float-end">${m.date}</small>`;
+            messagesDiv.appendChild(div);
+          });
+          lastMessages = data;
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+      });
+  }
+
+  loadMessages();
+  setInterval(loadMessages, 3000);
+</script>
+{% endblock %}

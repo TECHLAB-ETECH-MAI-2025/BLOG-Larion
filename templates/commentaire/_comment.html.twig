@@ -1,0 +1,6 @@
+<div class="commentaire" style="margin-bottom: 15px;">
+    <strong>{{ commentaire.auteur }}</strong>
+    <span style="color: #888;"> — {{ commentaire.createdAt|date('d/m/Y H:i') }}</span>
+
+    <p>{{ commentaire.contenu|nl2br }}</p>
+</div>

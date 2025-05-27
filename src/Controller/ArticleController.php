@@ -3,35 +3,35 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\ArticleLike;
 use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
+use App\Repository\ArticleLikeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Knp\Component\Pager\PaginatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 #[Route('/article')]
 class ArticleController extends AbstractController
 {
     #[Route('/', name: 'app_article_index', methods: ['GET'])]
-public function index(Request $request, ArticleRepository $articleRepository, PaginatorInterface $paginator): Response
-{
-    // Crée une requête pour récupérer tous les articles
-    $query = $articleRepository->createQueryBuilder('a')->getQuery();
+    public function index(Request $request, ArticleRepository $articleRepository, PaginatorInterface $paginator): Response
+    {
+        $query = $articleRepository->createQueryBuilder('a')->getQuery();
 
-    // Paginer les résultats
-    $pagination = $paginator->paginate(
-        $query,                     // Requête à paginer
-        $request->query->getInt('page', 1), // Numéro de la page depuis l'URL (default = 1)
-        10                        // Nombre d'articles par page
-    );
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            5
+        );
 
-    return $this->render('article/index.html.twig', [
-        'articles' => $pagination,  // On envoie l'objet paginé à la vue
-    ]);
-}
+        return $this->render('article/index.html.twig', [
+            'articles' => $pagination,
+        ]);
+    }
 
     #[Route('/new', name: 'app_article_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -54,12 +54,54 @@ public function index(Request $request, ArticleRepository $articleRepository, Pa
     }
 
     #[Route('/{id}', name: 'app_article_show', methods: ['GET'])]
-    public function show(Article $article): Response
+    public function show(Article $article, Request $request, ArticleLikeRepository $likeRepository): Response
     {
+        $ipAddress = $request->getClientIp();
+
+        $isLiked = $likeRepository->findOneBy([
+            'article' => $article,
+            'ipAddress' => $ipAddress,
+        ]) !== null;
+
         return $this->render('article/show.html.twig', [
             'article' => $article,
+            'is_liked' => $isLiked,
         ]);
     }
+
+    #[Route('/article/{id}/like', name: 'app_article_like', methods: ['POST'])]
+public function like(Article $article, Request $request, EntityManagerInterface $em, ArticleLikeRepository $likeRepo): JsonResponse
+{
+    $user = $this->getUser();
+    if (!$user) {
+        return new JsonResponse(['status' => 'error', 'message' => 'Connectez-vous d\'abord.'], 403);
+    }
+
+    $data = json_decode($request->getContent(), true);
+    $token = $data['_token'] ?? '';
+
+    if (!$this->isCsrfTokenValid('like' . $article->getId(), $token)) {
+        return new JsonResponse(['status' => 'error', 'message' => 'Token CSRF invalide.'], 400);
+    }
+
+    $existingLike = $likeRepo->findOneBy(['article' => $article, 'user' => $user]);
+
+    if ($existingLike) {
+        $em->remove($existingLike);
+    } else {
+        $like = new ArticleLike();
+        $like->setArticle($article);
+        $like->setUser($user);
+        $em->persist($like);
+    }
+
+    $em->flush();
+
+    return new JsonResponse([
+        'status' => 'success',
+        'likes' => $likeRepo->count(['article' => $article])
+    ]);
+}
 
     #[Route('/{id}/edit', name: 'app_article_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Article $article, EntityManagerInterface $entityManager): Response

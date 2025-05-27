@@ -1,38 +1,95 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Article{% endblock %}
+{% block title %}{{ article.titre }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('article') }}
+    {# Bootstrap CSS (si ce n’est pas déjà dans base.html.twig) #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('article') }}
+    {# Bootstrap JS Bundle (Popper inclus) #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1 class="mb-4">Article</h1>
+<div class="container my-5">
 
-        <table class="table table-bordered table-striped">
-            <tbody>
-                <tr>
-                    <th scope="row">Id</th>
-                    <td>{{ article.id }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Titre</th>
-                    <td>{{ article.titre }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Contenu</th>
-                    <td>{{ article.contenu }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <h1 class="mb-4">{{ article.titre }}</h1>
 
-        <div class="d-flex gap-2">
-            <a href="{{ path('app_article_index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Retour à la liste
-            </a>
+    <p class="text-muted">Likes : <span class="badge bg-danger">{{ article.articleLikes|length }}</span></p>
 
-            <a href="{{ path('app_article_edit', {'id': article.id}) }}" class="btn btn-primary">
-                <i class="bi bi-pencil-square"></i> Modifier
-            </a>
+    {# Bouton J’aime #}
+    <form method="post" action="{{ path('app_article_like', {'id': article.id}) }}" class="mb-4">
+        <input type="hidden" name="_token" value="{{ csrf_token('like' ~ article.id) }}">
+        <button type="submit" class="btn btn-outline-danger">
+            ❤️ J’aime
+        </button>
+    </form>
 
-            {{ include('article/_delete_form.html.twig') }}
+    <p><a href="{{ path('app_article_index') }}" class="btn btn-secondary mb-4">← Retour à la liste</a></p>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            {{ article.contenu|nl2br }}
         </div>
     </div>
+
+    {% if article.categories|length > 0 %}
+        <div class="mb-4">
+            <h5>Catégories :</h5>
+            <ul class="list-inline">
+                {% for category in article.categories %}
+                    <li class="list-inline-item badge bg-primary me-1">{{ category.nom }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <p class="text-muted mb-5">Date de création : {{ article.dateCreation|date('d/m/Y H:i') }}</p>
+
+    <h2 class="mb-4">Commentaires ({{ article.commentaires|length }})</h2>
+
+    {# Affichage des messages flash (erreur, succès...) #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <a id="add-comment"></a> {# ancre #}
+    <form id="add-comment-form" method="post" action="{{ path('commentaire_add', {'articleId': article.id}) }}" class="mb-5">
+        <div class="mb-3">
+            <label for="author" class="form-label">Votre nom</label>
+            <input type="text" id="author" name="author" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Votre commentaire</label>
+            <textarea id="content" name="content" rows="4" class="form-control" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Publier</button>
+    </form>
+
+    {% if article.commentaires|length > 0 %}
+        <h3 class="mb-3">Commentaires récents :</h3>
+        <ul class="list-group mb-5">
+            {% for comment in article.commentaires %}
+                <li class="list-group-item">
+                    {# Ici on passe la variable 'commentaire' à _comment.html.twig #}
+                    {% include 'commentaire/_comment.html.twig' with {'commentaire': comment} %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted fst-italic">Aucun commentaire pour le moment. Soyez le premier à réagir !</p>
+    {% endif %}
+
+</div>
 {% endblock %}

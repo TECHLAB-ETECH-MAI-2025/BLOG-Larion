@@ -1,0 +1,9 @@
+nelmio_cors:
+    defaults:
+        allow_origin: ['http://localhost:3001']  # ton frontend React
+        allow_credentials: true
+        allow_headers: ['Content-Type', 'Authorization']
+        allow_methods: ['GET', 'POST', 'OPTIONS']
+    paths:
+        '^/api/':
+            allow_origin: ['http://localhost:3001']

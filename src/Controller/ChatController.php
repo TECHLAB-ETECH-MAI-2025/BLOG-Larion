@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
+
 class ChatController extends AbstractController
 {
     #[Route('/chat', name: 'chat_index')]
